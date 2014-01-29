@@ -1,0 +1,29 @@
+{
+  "name": "http-job-queue",
+  "version": "0.0.1",
+  "description": "Job queue that uses plain HTTP API instead of language specific bindings.",
+  "scripts": {
+    "test": "mocha -R spec --compilers coffee:coffee-script"
+  },
+  "main": "./lib/server",
+  "keywords": [
+    "job queue",
+    "http",
+    "api"
+  ],
+  "author": "Brennan Cheung",
+  "license": {
+    "type": "MIT",
+    "url": "http://github.com/brennancheung/http-job-queue/blob/master/LICENSE"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/brennancheung/http-job-queue.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "should": "~3.1.2",
+    "mocha": "~1.17.1",
+    "coffee-script": "~1.6.3"
+  }
+}
