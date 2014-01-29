@@ -17,5 +17,4 @@ exports.start = ->
   @server.listen(@port)
 
 exports.stop = ->
-  console.log 'stopping the server'
   @server.close()

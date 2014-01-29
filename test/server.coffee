@@ -4,6 +4,14 @@ should = require('should')
 
 delay = (ms, fn) -> setTimeout fn, ms
 
+assertRequest = (url, params) ->
+  data = ''
+  http.get url, (res) ->
+    res.on 'data', (chunk) -> data += chunk
+    res.on 'end', ->
+      res.statusCode.should.equal params.statusCode if params.statusCode
+      data.should.equal params.contents if params.contents
+
 describe 'everything', ->
   before ->
     server.config 3100
@@ -14,16 +22,17 @@ describe 'everything', ->
 
   describe 'server related stuff', ->
     it 'should return 200', ->
-      http.get 'http://localhost:3100', (res) ->
-        res.statusCode.should.equal 200
+      assertRequest 'http://localhost:3100',
+        statusCode: 200
 
     it 'should say hello', ->
-      data = ''
-      http.get 'http://localhost:3100', (res) ->
-        res.on 'data', (chunk) -> data += chunk
-        res.on 'end', ->
-          data.should.equal 'Hello World'
+      assertRequest 'http://localhost:3100',
+        contents: 'Hello World'
 
+    it 'should be able to combine assertRequest conditions', ->
+      assertRequest 'http://localhost:3100',
+        contents: 'Hello World'
+        statusCode: 200
 
   describe 'configuration', ->
     it 'should provide a reasonable default config'
