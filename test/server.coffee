@@ -1,38 +1,57 @@
 http = require('http')
-server = require('../lib/server')
+Server = require('../lib/server')
 should = require('should')
 
 delay = (ms, fn) -> setTimeout fn, ms
 
-assertRequest = (url, params) ->
+assertRequest = (url, params, done) ->
   data = ''
   http.get url, (res) ->
     res.on 'data', (chunk) -> data += chunk
     res.on 'end', ->
       res.statusCode.should.equal params.statusCode if params.statusCode
       data.should.equal params.contents if params.contents
+      done() if done
 
-describe 'everything', ->
-  before ->
-    server.config 3100
+describe 'server customization', ->
+  it 'should allow server to be started', (done) ->
+    server = new Server(port: 3100)
     server.start()
+    assertRequest 'http://localhost:3100', {contents: 'Hello World', statusCode: 200}, ->
+      server.stop()
+      done()
+
+  it 'should allow server the request handler to be injected', (done) ->
+    server = new Server
+      port: 3100
+      requestHandler: (req, res) ->
+        res.writeHead 200, {'Content-Type': 'text/html'}
+        res.end 'injected'
+    server.start()
+    assertRequest 'http://localhost:3100',
+      contents: 'injected'
+      statusCode: 200
+      , () ->
+        server.stop()
+        done()
+
+describe 'default server', ->
+  before ->
+    @server = new Server(port: 3100)
+    @server.start()
 
   after ->
-    server.stop()
+    @server.stop()
 
-  describe 'server related stuff', ->
+  describe 'server related stuff', (done) ->
     it 'should return 200', ->
-      assertRequest 'http://localhost:3100',
-        statusCode: 200
+      assertRequest 'http://localhost:3100', {statusCode: 200}, done
 
-    it 'should say hello', ->
-      assertRequest 'http://localhost:3100',
-        contents: 'Hello World'
+    it 'should say hello', (done) ->
+      assertRequest 'http://localhost:3100', {contents: 'Hello World'}, done
 
-    it 'should be able to combine assertRequest conditions', ->
-      assertRequest 'http://localhost:3100',
-        contents: 'Hello World'
-        statusCode: 200
+    it 'should be able to combine assertRequest conditions', (done) ->
+      assertRequest 'http://localhost:3100', {contents: 'Hello World', statusCode: 200}, done
 
   describe 'configuration', ->
     it 'should provide a reasonable default config'

@@ -1,20 +1,18 @@
 http = require('http')
 
-@server = http.createServer (req, res) ->
-  res.writeHead 200, {'Content-Type': 'text/html'}
-  res.write 'Hello World'
-  res.end()
+class Server
+  constructor: (params) ->
+    params ||= {}
+    @port = params.port || 3000
+    @requestHandler = params.requestHandler || (req, res) ->
+      res.writeHead 200, {'Content-Type': 'text/html'}
+      res.end 'Hello World'
+    @server = http.createServer @requestHandler
 
-@port = 3000
-@config = {}
+  start: () ->
+    @server.listen(@port)
 
-exports.config = (port, config) ->
-  @port = port if port
-  @config = config if config
+  stop: () ->
+    @server.close()
 
-exports.start = ->
-  # console.log "starting the server on port #{@port}"
-  @server.listen(@port)
-
-exports.stop = ->
-  @server.close()
+module.exports = Server
