@@ -14,14 +14,15 @@ assertRequest = (url, params, done) ->
       done() if done
 
 describe 'server customization', ->
-  it 'should allow server to be started', (done) ->
+  # I'll probably get rid of these later.  Just for incremental development right now.
+  it 'starting the server', (done) ->
     server = new Server(port: 3100)
     server.start()
     assertRequest 'http://localhost:3100', {contents: 'Hello World', statusCode: 200}, ->
       server.stop()
       done()
 
-  it 'should allow server the request handler to be injected', (done) ->
+  it 'request handler injection', (done) ->
     server = new Server
       port: 3100
       requestHandler: (req, res) ->
@@ -53,17 +54,16 @@ describe 'default server', ->
     it 'should be able to combine assertRequest conditions', (done) ->
       assertRequest 'http://localhost:3100', {contents: 'Hello World', statusCode: 200}, done
 
-  describe 'configuration', ->
-    it 'should provide a reasonable default config'
-    it 'should take an optional command line -c (--config) file'
+  describe 'authentication', ->
+    it 'requests should be authenticated'
 
   describe 'jobs', ->
-    it 'should accept jobs from HTTP'
-    it 'should deliver jobs to requesters'
+    it 'accept jobs from HTTP'
+    it 'deliver jobs to requesters'
 
   describe 'error conditions', ->
-    it 'should detect jobs that take too long'
-    it 'should detect jobs that error out'
-    it 'should kill jobs that time out'
-    it 'should send a notification for timeouts'
-    it 'should send a notification for jobs that error out'
+    it 'detect jobs that take too long'
+    it 'detect jobs that error out'
+    it 'kill jobs that time out'
+    it 'send a notification for timeouts'
+    it 'send a notification for jobs that error out'
