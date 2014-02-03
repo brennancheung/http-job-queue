@@ -13,7 +13,7 @@ class Main
     fs.readFile filename, 'utf-8', (err, data) ->
       if err
         console.error(err)
-        process.exit()
+        throw "can't read config file " + filename
       else
         conf = yaml.load data
         done(conf)

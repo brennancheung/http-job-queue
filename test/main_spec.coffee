@@ -8,3 +8,4 @@ Main = require('../lib/main')
 stubs = require './helpers/stubs'
 
 describe 'main', ->
+

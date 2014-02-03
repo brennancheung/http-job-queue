@@ -34,7 +34,10 @@ describe 'configuration', ->
         done()
 
     it 'invalid file contents'
+      # throw an error
+
     it 'missing file'
+      # just return null, using a 'merge' with null is basically a NOP
 
   it 'optional /etc/http-job-queue/config.yml'
   it 'optional ~/.http-job-queue/config.yml'
