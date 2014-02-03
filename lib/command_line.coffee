@@ -52,3 +52,5 @@ module.exports = ->
     config[option] = program[option] if program[option]
 
   return config
+
+  # testing
