@@ -4,7 +4,7 @@ merge = require 'merge'
 class Main
   constructor: ->
     @serverMode = true
-    @commandLineConfig = commandLine()
+    @processConfig()
 
   processConfig: ->
     # generate the config hash
@@ -12,7 +12,10 @@ class Main
       port: 3000
       log: false
 
+    @commandLineConfig = commandLine()
     @config = merge defaultConfig, @etcConfig, @homeConfig, @commandLineConfig
+
+    @processCommand() if @config.command
 
   processCommand: ->
     # commands don't start up a listener server
@@ -35,7 +38,7 @@ class Main
       realtime: ->
         console.log 'TODO: show jobs in realtime'
 
-    commands[@config.command] if @config.command
+    commands[@config.command]() if @config.command
 
   startServer: ->
     if @serverMode
