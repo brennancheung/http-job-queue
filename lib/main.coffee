@@ -1,21 +1,30 @@
 commandLine = require './command_line'
 merge = require 'merge'
+yaml = require 'js-yaml'
+fs = require 'fs'
 
 class Main
   constructor: ->
     @serverMode = true
     @processConfig()
+    @processCommand() if @config.command
+
+  loadYamlFile: (filename, done) ->
+    fs.readFile filename, 'utf-8', (err, data) ->
+      if err
+        console.error(err)
+        process.exit()
+      else
+        conf = yaml.load data
+        done(conf)
 
   processConfig: ->
-    # generate the config hash
     defaultConfig =
       port: 3000
       log: false
 
     @commandLineConfig = commandLine()
     @config = merge defaultConfig, @etcConfig, @homeConfig, @commandLineConfig
-
-    @processCommand() if @config.command
 
   processCommand: ->
     # commands don't start up a listener server

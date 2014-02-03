@@ -1,24 +1,41 @@
-Main = require('../lib/main')
 should = require('should')
-require 'mocha-sinon'
+mochaSinon = require 'mocha-sinon'
+fs = require 'fs'
+yaml = require 'js-yaml'
 
-helpers = require './mocha_helpers'
-stubArgv = helpers.stubArgv
+Main = require('../lib/main')
+
+stubs = require './helpers/stubs'
 
 describe 'configuration', ->
   it 'provide a reasonable default config', ->
-    stubArgv @, '-L info'
-    main = new Main()
-    main.processConfig()
+    stubs.argv @
+    main = new Main
     main.config.port.should.equal 3000
 
   it 'allow command line arguments to override the config', ->
-    stubArgv @, '-p 5555'
+    stubs.argv @, '-p 5555'
     main = new Main()
-    main.processConfig()
     main.config.port.should.equal 5555
 
-  it 'optional command line -c (--config) file'
+  describe 'loading config files', ->
+    it 'valid yaml file', (done) ->
+      conf =
+        port: 5000
+        logLevel: 'error'
+        timeout: 123
+
+      confAsYaml = yaml.dump(conf)
+      stubs.readFile @, confAsYaml
+
+      (new Main).loadYamlFile 'custom-conf.yml', (loadedConfig) ->
+        loadedConfig.should.eql conf
+        (fs.readFile.calledWith 'custom-conf.yml').should.be.true
+        done()
+
+    it 'invalid file contents'
+    it 'missing file'
+
   it 'optional /etc/http-job-queue/config.yml'
   it 'optional ~/.http-job-queue/config.yml'
   it 'process the configs in the proper order'

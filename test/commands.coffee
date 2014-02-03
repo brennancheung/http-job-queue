@@ -3,8 +3,7 @@ should = require('should')
 commandLine = require '../lib/command_line'
 require 'mocha-sinon'
 
-helpers = require './mocha_helpers'
-stubArgv = helpers.stubArgv
+stubs = require './helpers/stubs'
 
 describe 'commands', ->
   it 'all: show all jobs'
