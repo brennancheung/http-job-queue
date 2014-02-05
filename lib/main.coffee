@@ -2,36 +2,43 @@ commandLine = require './command_line'
 merge = require 'merge'
 yaml = require 'js-yaml'
 fs = require 'fs'
+async = require 'async'
 
 class Main
   constructor: ->
     @serverMode = true
-    @processConfig()
-    @processCommand() if @config.command
 
-  loadYamlFile: (filename, done) ->
+  loadYamlFile: (filename, next) ->
     fs.readFile filename, 'utf-8', (err, data) ->
-      if err
-        console.error(err)
-        throw "can't read config file " + filename
-      else
-        conf = yaml.load data
-        done(conf)
+      return next(err, null) if err
+      conf = yaml.load data
+      next(null, conf)
 
-  processConfig: ->
+  loadConfigFile: (filepath, next) ->
+    self = @
+    return next(null, null) unless filepath
+    fs.exists filepath, (exists) ->
+      return next(null, null) unless exists
+      self.loadYamlFile filepath, next
+
+  processCommandLine: ->
+    @commandLineConfig = commandLine()
+
+  processConfig: (next) ->
     defaultConfig =
       port: 3000
       log: false
 
-    @commandLineConfig = commandLine()
-    @config = merge defaultConfig, @etcConfig, @homeConfig, @commandLineConfig
+    commandLineConfigFile = @commandLineConfig.configFile
+
+    @loadConfigFile commandLineConfigFile, (err, configFromFile) =>
+      return next(err, null) if err
+      @config = merge defaultConfig, configFromFile, @commandLineConfig
+      next(null, @config)
 
   processCommand: ->
     # commands don't start up a listener server
     @serverMode = false
-
-    # commands need the config information present before they can proceed
-    processConfig() unless @config
 
     commands =
       all:  ->

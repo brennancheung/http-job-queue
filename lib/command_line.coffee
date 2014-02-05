@@ -1,7 +1,14 @@
 program = require 'commander'
 merge = require 'merge'
 
-module.exports = ->
+module.exports = (override) ->
+  options = process.argv
+
+  if override
+    # allow dependency injection for easier testing
+    args = ['coffee', 'http-job-queue']
+    options = args.concat override.split(' ') if override.length > 0
+
   config = {}
 
   # Unfortunately, commander is not re-entrant for testing purposes.  We need to flush out the fields each time.
@@ -46,11 +53,9 @@ module.exports = ->
     .action -> config.command = 'realtime'
 
   program
-    .parse process.argv
+    .parse options
 
   for option in 'port configFile logPath logLevel timeout'.split(' ')
     config[option] = program[option] if program[option]
 
   return config
-
-  # testing

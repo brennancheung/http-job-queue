@@ -1,59 +1,44 @@
 should = require('should')
-mochaSinon = require 'mocha-sinon'
 
 Main = require('../lib/main')
 commandLine = require '../lib/command_line'
-
-stubs = require './helpers/stubs'
 
 describe 'command line', ->
 
   describe 'options', ->
     it 'port: -p, --port', ->
-      stubs.argv @, '-p 3100'
-      commandLine().port.should.equal 3100
+      commandLine('-p 3100').port.should.equal 3100
 
-      stubs.argv @, '--port 4000'
-      commandLine().port.should.equal 4000
+      commandLine('--port 4000').port.should.equal 4000
 
     it 'config-file: -c, --config-file parameter', ->
-      stubs.argv @, '-c custom.yml'
-      commandLine().configFile.should.equal 'custom.yml'
+      commandLine('-c custom.yml').configFile.should.equal 'custom.yml'
 
-      stubs.argv @, '--config-file custom-long.yml'
-      commandLine().configFile.should.equal 'custom-long.yml'
+      commandLine('--config-file custom-long.yml').configFile.should.equal 'custom-long.yml'
 
     it 'log-path: -l, --log-path', ->
-      stubs.argv @, '-l log.txt'
-      commandLine().logPath.should.equal 'log.txt'
+      commandLine('-l log.txt').logPath.should.equal 'log.txt'
 
-      stubs.argv @, '--log-path log-long.txt'
-      commandLine().logPath.should.equal 'log-long.txt'
+      commandLine('--log-path log-long.txt').logPath.should.equal 'log-long.txt'
 
     it 'log-level: -L, --log-level', ->
-      stubs.argv @, '-L info'
-      commandLine().logLevel.should.equal 'info'
+      commandLine('-L info').logLevel.should.equal 'info'
 
-      stubs.argv @, '--log-level error'
-      commandLine().logLevel.should.equal 'error'
+      commandLine('--log-level error').logLevel.should.equal 'error'
 
     it 'timeout: -t, --timeout', ->
-      stubs.argv @, '-t 60'
-      commandLine().timeout.should.equal 60
+      commandLine('-t 60').timeout.should.equal 60
 
-      stubs.argv @, '--timeout 180'
-      commandLine().timeout.should.equal 180
+      commandLine('--timeout 180').timeout.should.equal 180
 
   describe 'mixing', ->
     it 'allow multiple command line options', ->
-      stubs.argv @, '-p 8888 -L error'
-      config = commandLine()
+      config = commandLine('-p 8888 -L error')
       config.port.should.equal 8888
       config.logLevel.should.equal 'error'
 
     it 'allow commands and command line options to be combined', ->
-      stubs.argv @, '-p 1234 -L warn all'
-      config = commandLine()
+      config = commandLine('-p 1234 -L warn all')
       config.port.should.equal 1234
       config.logLevel.should.equal 'warn'
       config.command.should.equal 'all'
