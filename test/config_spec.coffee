@@ -33,9 +33,24 @@ describe 'configuration', ->
     it 'invalid file contents'
       # throw an error
 
-    it 'missing file'
-      # just return null, using a 'merge' with null is basically a NOP
+    it 'missing file', (done) ->
+      main = new Main
+      main.loadConfigFile __dirname + '/fixtures/does-not-exist.yml', (err, conf) ->
+        (conf == null).should.be.true
+        done()
 
-  it 'process the configs in the proper order'
-    # etc, home, specified config, command line
-  it 'command line commands do not start a listener'
+  it 'start listener if command not present', ->
+    main = new Main
+    main.processCommandLine()
+    main.processConfig (err, config) ->
+      main.processCommand()
+      main.serverMode.should.be.true
+
+  it 'command line commands do not start a listener', ->
+    main = new Main
+    main.serverMode.should.be.true
+    main.processCommandLine 'all -p 4444'
+    main.processConfig (err, config) ->
+      config.port.should.equal 4444
+      main.processCommand()
+      main.serverMode.should.be.false

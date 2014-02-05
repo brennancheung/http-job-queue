@@ -8,28 +8,27 @@ describe 'command line', ->
   describe 'options', ->
     it 'port: -p, --port', ->
       commandLine('-p 3100').port.should.equal 3100
-
       commandLine('--port 4000').port.should.equal 4000
 
     it 'config-file: -c, --config-file parameter', ->
       commandLine('-c custom.yml').configFile.should.equal 'custom.yml'
-
       commandLine('--config-file custom-long.yml').configFile.should.equal 'custom-long.yml'
 
     it 'log-path: -l, --log-path', ->
       commandLine('-l log.txt').logPath.should.equal 'log.txt'
-
       commandLine('--log-path log-long.txt').logPath.should.equal 'log-long.txt'
 
     it 'log-level: -L, --log-level', ->
       commandLine('-L info').logLevel.should.equal 'info'
-
       commandLine('--log-level error').logLevel.should.equal 'error'
 
     it 'timeout: -t, --timeout', ->
       commandLine('-t 60').timeout.should.equal 60
-
       commandLine('--timeout 180').timeout.should.equal 180
+
+    it 'execute-script: -x --execute-script', ->
+      commandLine('-x foo.js').executeScript.should.equal 'foo.js'
+      commandLine('--execute-script foo-long.js').executeScript.should.equal 'foo-long.js'
 
   describe 'mixing', ->
     it 'allow multiple command line options', ->

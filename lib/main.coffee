@@ -21,8 +21,8 @@ class Main
       return next(null, null) unless exists
       self.loadYamlFile filepath, next
 
-  processCommandLine: ->
-    @commandLineConfig = commandLine()
+  processCommandLine: (override) ->
+    @commandLineConfig = commandLine(override)
 
   processConfig: (next) ->
     defaultConfig =
@@ -37,8 +37,9 @@ class Main
       next(null, @config)
 
   processCommand: ->
-    # commands don't start up a listener server
-    @serverMode = false
+    if @config.command
+      # commands don't start up a listener server
+      @serverMode = false
 
     commands =
       all:  ->

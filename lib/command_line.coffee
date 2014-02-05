@@ -4,15 +4,18 @@ merge = require 'merge'
 module.exports = (override) ->
   options = process.argv
 
+  # allow dependency injection for easier testing
   if override
-    # allow dependency injection for easier testing
     args = ['coffee', 'http-job-queue']
+    # add 2 entries in the front to make it look like it came from process.argv
     options = args.concat override.split(' ') if override.length > 0
 
   config = {}
 
+  possibleOptions = 'configFile port logPath logLevel timeout executeScript'.split ' '
+
   # Unfortunately, commander is not re-entrant for testing purposes.  We need to flush out the fields each time.
-  for option in 'configFile port logPath logLevel timeout'.split ' '
+  for option in possibleOptions
     program[option] = undefined
 
   program
@@ -21,6 +24,7 @@ module.exports = (override) ->
     .option '-l, --log-path <path>',    'log file'
     .option '-L, --log-level <level>',  'log level (debug, info, warn, error)'
     .option '-t, --timeout <seconds>',  'amount of time a job can run before timing out', parseInt
+    .option '-x, --execute-script <path>',  'script for processing a job'
 
   program
     .command 'all'
@@ -55,7 +59,7 @@ module.exports = (override) ->
   program
     .parse options
 
-  for option in 'port configFile logPath logLevel timeout'.split(' ')
+  for option in possibleOptions
     config[option] = program[option] if program[option]
 
   return config

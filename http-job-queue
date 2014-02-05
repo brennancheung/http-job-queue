@@ -2,5 +2,7 @@
 
 Main = require './lib/main'
 
-main = new Main()
+main = new Main
+main.processCommandLine()
+main.processCommand()
 main.startServer()
