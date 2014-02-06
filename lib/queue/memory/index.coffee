@@ -1,4 +1,4 @@
-uuid = require 'uuid'
+uuid = require 'node-uuid'
 
 class Queue
   constructor: ->
@@ -17,31 +17,32 @@ class Queue
       status: 'pending'
       tags: tags || []
 
-    log 'submit', job
+    @log 'submit', job
     @pending.push job
+    return @job
 
   fetch: (userId, tags) ->
     # move the job from @pending to @processing
     for job, idx in @pending when job.userId == userId
-      removed = @pending.splce(idx, 1)
-      @procesing.push removed
-      log 'fetch', removed
+      removed = @pending.splice(idx, 1)[0]
+      @processing.push removed
+      @log 'fetch', removed
       return removed
 
   finish: (jobId) ->
     # move the job from @processing to @done
     for job, idx in @processing when job.id == jobId
-      removed = @processing.splce(idx, 1)
+      removed = @processing.splice(idx, 1)[0]
       @done.push removed
-      log 'finish', removed
+      @log 'finish', removed
       return removed
 
   fail: (jobId) ->
     # move the job from @processing to @failed
     for job, idx in @processing when job.id == jobId
-      removed = @processing.splce(idx, 1)
+      removed = @processing.splice(idx, 1)[0]
       @failed.push removed
-      log 'fail', removed
+      @log 'fail', removed
       return removed
 
   log: (action, job) ->

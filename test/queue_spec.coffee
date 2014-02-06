@@ -1,6 +1,6 @@
 should = require('should')
 
-Main = require('../lib/main')
+Queue = require '../lib/queue/memory'
 
 describe 'queue', ->
 
@@ -11,8 +11,20 @@ describe 'queue', ->
   describe 'persistence strategy', ->
 
     describe 'in memory', ->
-      it 'submit a job'
-      it 'fetch next job atomically'
+      it 'submit a job', ->
+        queue = new Queue
+        queue.submit 1, {foo: 'bar'}
+        queue.pending.length.should.equal == 1
+        queue.pending[0].payload.foo.should.equal 'bar'
+
+      it 'fetch next job atomically', ->
+        queue = new Queue
+        queue.submit 1, {foo: 'bar'}
+        job = queue.fetch(1)
+        job.should.be.ok
+        job.payload.foo.should.equal.bar
+        job.id.should.be.ok
+
       it 'fetch all jobs'
       it 'fetch pending jobs'
       it 'fetch processing jobs'
