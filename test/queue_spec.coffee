@@ -1,6 +1,7 @@
 should = require('should')
 
-Queue = require '../lib/queue/memory'
+MemoryQueue = require '../lib/queue/memory'
+MongodbQueue = require '../lib/queue/mongodb'
 
 describe 'queue', ->
 
@@ -10,7 +11,7 @@ describe 'queue', ->
 
   describe 'persistence strategy', ->
 
-    describe 'in memory', ->
+    queueInterfaceTests = (Queue) ->
       it 'submit a job', ->
         queue = new Queue
         queue.submit 1, {foo: 'bar'}
@@ -34,14 +35,8 @@ describe 'queue', ->
       it 'clear a specific queue'
       it 'clear all jobs'
 
-    describe 'MongoDB', ->
-      it 'submit a job'
-      it 'fetch next job atomically'
-      it 'fetch all jobs'
-      it 'fetch pending jobs'
-      it 'fetch processing jobs'
-      it 'fetch done jobs'
-      it 'fetch failed jobs'
-      it 'stream jobs as they change'
-      it 'clear a specific queue'
-      it 'clear all jobs'
+    describe 'in memory', ->
+      queueInterfaceTests(MemoryQueue)
+
+    describe.skip 'MongoDB', ->
+      queueInterfaceTests(MongodbQueue)
