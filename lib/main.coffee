@@ -2,7 +2,6 @@ commandLine = require './command_line'
 merge = require 'merge'
 yaml = require 'js-yaml'
 fs = require 'fs'
-async = require 'async'
 
 class Main
   constructor: ->
