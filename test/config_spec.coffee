@@ -30,8 +30,12 @@ describe 'configuration', ->
         config.timeout.should.equal 1234
         done()
 
-    it 'invalid file contents'
-      # throw an error
+    it 'invalid file contents', (done) ->
+      main = new Main
+      main.loadConfigFile __dirname + '/fixtures/invalid-yaml.txt', (err, conf) ->
+        (err  == null).should.be.false
+        (conf == null).should.be.true
+        done()
 
     it 'missing file', (done) ->
       main = new Main
@@ -54,3 +58,36 @@ describe 'configuration', ->
       config.port.should.equal 4444
       main.processCommand()
       main.serverMode.should.be.false
+
+  describe 'choosing persistence strategy', ->
+    it 'default to "memory" strategy', (done) ->
+      main = new Main
+      main.processCommandLine()
+      main.processConfig (err, config) ->
+        config.strategy.should.equal 'memory'
+        done()
+
+    it 'only accept valid strategies', (done) ->
+      main = new Main
+      main.processCommandLine()
+      main.commandLineConfig.strategy = 'not a strategy'
+      try
+        main.processConfig()
+      catch exception
+        exception.should.match /invalid strategy/
+        done()
+
+    it 'set persistence strategy from the config file', (done) ->
+      main = new Main
+      main.processCommandLine '-c ' + __dirname + '/fixtures/persistence.yml'
+      main.processConfig (err, config) ->
+        config.strategy.should.equal 'mongodb'
+        done()
+
+    it 'set additional presistence parameters', (done) ->
+      main = new Main
+      main.processCommandLine '-c ' + __dirname + '/fixtures/persistence.yml'
+      main.processConfig (err, config) ->
+        config.mongodb.port.should.equal 27017
+        config.mongodb.database.should.equal 'jobs'
+        done()

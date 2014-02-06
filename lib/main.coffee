@@ -11,8 +11,12 @@ class Main
   loadYamlFile: (filename, next) ->
     fs.readFile filename, 'utf-8', (err, data) ->
       return next(err, null) if err
-      conf = yaml.load data
-      next(null, conf)
+      try
+        conf = yaml.load data
+        next(null, conf)
+      catch exception
+        next(exception, null)
+
 
   loadConfigFile: (filepath, next) ->
     self = @
@@ -28,12 +32,20 @@ class Main
     defaultConfig =
       port: 3000
       log: false
+      strategy: 'memory'
 
     commandLineConfigFile = @commandLineConfig.configFile
 
     @loadConfigFile commandLineConfigFile, (err, configFromFile) =>
       return next(err, null) if err
       @config = merge defaultConfig, configFromFile, @commandLineConfig
+
+      # error if they use an invalid strategy
+      unless @config.strategy in ['memory', 'mongodb']
+        @serverMode = false
+        @config.command = undefined
+        throw 'invalid strategy'
+
       next(null, @config)
 
   processCommand: ->

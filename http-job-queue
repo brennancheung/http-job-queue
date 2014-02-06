@@ -4,5 +4,6 @@ Main = require './lib/main'
 
 main = new Main
 main.processCommandLine()
-main.processCommand()
-main.startServer()
+main.processConfig (err, config) ->
+  main.processCommand()
+  main.startServer()

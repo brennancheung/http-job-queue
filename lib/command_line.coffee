@@ -12,7 +12,7 @@ module.exports = (override) ->
 
   config = {}
 
-  possibleOptions = 'configFile port logPath logLevel timeout executeScript'.split ' '
+  possibleOptions = 'configFile port logPath logLevel timeout executeScript strategy'.split ' '
 
   # Unfortunately, commander is not re-entrant for testing purposes.  We need to flush out the fields each time.
   for option in possibleOptions
@@ -24,6 +24,7 @@ module.exports = (override) ->
     .option '-l, --log-path <path>',    'log file'
     .option '-L, --log-level <level>',  'log level (debug, info, warn, error)'
     .option '-t, --timeout <seconds>',  'amount of time a job can run before timing out', parseInt
+    .option '-s, --strategy <type>',    'strategy for persistence'
     .option '-x, --execute-script <path>',  'script for processing a job'
 
   program

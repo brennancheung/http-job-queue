@@ -30,6 +30,10 @@ describe 'command line', ->
       commandLine('-x foo.js').executeScript.should.equal 'foo.js'
       commandLine('--execute-script foo-long.js').executeScript.should.equal 'foo-long.js'
 
+    it 'strategy: -s --strategy', ->
+      commandLine('-s mongodb').strategy.should.equal 'mongodb'
+      commandLine('--strategy redis').strategy.should.equal 'redis'
+
   describe 'mixing', ->
     it 'allow multiple command line options', ->
       config = commandLine('-p 8888 -L error')

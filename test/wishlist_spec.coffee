@@ -15,3 +15,6 @@ describe 'feature wishlist', ->
     it 'support for https://github.com/elliotf/mocha-sinon/issues/1'
     it 'provide mechanism for easy sandboxing (beforeEach -> stubs = new Stubs ; afterEach -> stubs.restore()'
     it 'clear commander cache, http://stuffpetedoes.blogspot.com/2012/07/grunt-watch-and-nodejs-require-cache.html'
+  describe 'tags', ->
+    it 'jobs can be assigned tags'
+    it 'server can be configured to only run jobs for a particular tag'
