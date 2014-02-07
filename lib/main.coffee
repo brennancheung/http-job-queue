@@ -2,6 +2,8 @@ commandLine = require './command_line'
 merge = require 'merge'
 yaml = require 'js-yaml'
 fs = require 'fs'
+Server = require './server'
+router = require './router'
 
 class Main
   constructor: ->
@@ -71,5 +73,9 @@ class Main
   startServer: ->
     if @serverMode
       console.log "Starting server"
+      params = @config
+      params.router = router
+      server = new Server(params)
+      server.start()
 
 module.exports = Main

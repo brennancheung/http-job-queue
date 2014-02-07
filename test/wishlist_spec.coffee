@@ -18,3 +18,5 @@ describe 'feature wishlist', ->
   describe 'tags', ->
     it 'jobs can be assigned tags'
     it 'server can be configured to only run jobs for a particular tag'
+  describe 'API', ->
+    it 'POST callback for subscribers'

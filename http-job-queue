@@ -1,6 +1,7 @@
 #!/usr/bin/env coffee
 
 Main = require './lib/main'
+router = require './lib/router'
 
 main = new Main
 main.processCommandLine()

@@ -7,8 +7,9 @@ class Queue
     @done = []
     @failed = []
     @journal = []
+    @subscribers = []
 
-  submit: (userId, payload, tags) ->
+  createJob: (userId, payload, tags) ->
     job =
       id: uuid.v4()
       userId: userId
@@ -17,39 +18,60 @@ class Queue
       status: 'pending'
       tags: tags || []
 
-    @log 'submit', job
-    @pending.push job
-    return @job
+  addToQueue: (queue, job) ->
+    @[queue].push job
+
+  submit: (userId, payload, tags) ->
+    job = @createJob userId, payload, tags
+    @publish 'submit', job
+    @addToQueue 'pending', job
+    return job
 
   fetch: (userId, tags) ->
     # move the job from @pending to @processing
     for job, idx in @pending when job.userId == userId
       removed = @pending.splice(idx, 1)[0]
-      @processing.push removed
-      @log 'fetch', removed
+      @addToQueue 'processing', removed
+      @publish 'fetch', removed
       return removed
 
   finish: (jobId) ->
     # move the job from @processing to @done
     for job, idx in @processing when job.id == jobId
       removed = @processing.splice(idx, 1)[0]
-      @done.push removed
-      @log 'finish', removed
+      @addToQueue 'done', removed
+      @publish 'finish', removed
       return removed
 
   fail: (jobId) ->
     # move the job from @processing to @failed
     for job, idx in @processing when job.id == jobId
       removed = @processing.splice(idx, 1)[0]
-      @failed.push removed
-      @log 'fail', removed
+      @addToQueue 'failed', removed
+      @publish 'fail', removed
       return removed
 
-  log: (action, job) ->
-    @journal.push
+  subscribe: (action, callback) ->
+    subscriber =
+      id: uuid.v4()
+      action: action
+      callback: callback
+    @subscribers.push subscriber
+
+  unsubscribe: (id) ->
+    for subscriber, idx in @subscribers when subscriber.id == id
+      removed = @subscribers.splice(idx, 1)[0]
+      return true
+    return false
+
+  publish: (action, job) ->
+    event =
       action: action
       ts: (new Date).getTime()
       job: job
+    @journal.push event
+    for subscriber in @subscribers when subscriber.action == action || subscriber.action == 'all'
+      subscriber.callback(job)
 
   countAll: ->
     total = 0
@@ -58,16 +80,20 @@ class Queue
     total += @done.length
     total += @failed.length
 
+  clearQueue: (queue) ->
+    @[queue] = []
+
+  clearAll: ->
+    @clearQueue 'pending'
+    @clearQueue 'processing'
+    @clearQueue 'done'
+    @clearQueue 'failed'
+
   fetchPending:    -> @pending
   fetchProcessing: -> @processing
   fetchDone:       -> @done
   fetchFailed:     -> @failed
   fetchAll:        -> @pending.concat(@processing).concat(@done).concat(@failed)
-
-  streamPending:    (callback) -> callback(job) for job in @pending
-  streamProcessing: (callback) -> callback(job) for job in @processing
-  streamDone:       (callback) -> callback(job) for job in @done
-  streamFailed:     (callback) -> callback(job) for job in @failed
 
   countPending:    -> @pending.length
   countProcessing: -> @processing.length
